@@ -1,0 +1,47 @@
+<?php
+	error_reporting(E_ALL ^ E_NOTICE); 
+    header("Content-type: application/x-java-jnlp-file");
+    header('Content-Disposition: attachment; filename="corr.jnlp"');
+    header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+    header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+    header("Cache-Control: no-store, no-cache, must-revalidate");
+    header("Cache-control: post-check=0, pre-check=0, false");
+    header("Pragma: no-cache");
+    header("Content-Type: application/x-java-jnlp-file");
+    $CORRELATIONFILE=htmlspecialchars($_GET['correlationFile']);
+	print('<?xml version="1.0" encoding="utf-8"?>');
+?>
+<jnlp codebase="http://metscape.ncibi.org/correlations">
+  <information>
+    <title>Correlation Calculator</title>
+    <vendor>University of Michigan</vendor>
+    <homepage href="http://ncibi.metscape.org"/>
+    <offline-allowed/>
+  </information>
+  <security>
+     <all-permissions/>
+  </security>
+  <update check="always" policy="always"/>
+  <resources>
+    <j2se version="$j2seVersion" 
+	      java-vm-args="-Dsun.lang.ClassLoader.allowArraySyntax=true"
+<?php 
+   $MAXHEAP="1024M";
+   print('		max-heap-size="');
+   print($MAXHEAP);
+   print('"/>');
+?>
+     $dependencies
+  </resources>
+  <application-desc main-class="edu.umich.wld.CorrelationCalculator">
+<?php
+	if ($CORRELATIONFILE != null) {
+		print("        <argument>-P</argument>\n");
+		print("        <argument>correlationFile=");
+		print($CORRELATIONFILE);
+		print("</argument>\n");
+	}
+?>
+  </application-desc>
+</jnlp>
+
