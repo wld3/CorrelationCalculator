@@ -11,15 +11,12 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -79,7 +76,6 @@ public class AnalysisDialog extends JDialog {
 	private static final String FILE_SEPARATOR = System.getProperty("file.separator");
 	private static final String TEMP_DIRECTORY = System.getProperty("java.io.tmpdir") + FILE_SEPARATOR;
 	private static final String HOME_DIRECTORY = System.getProperty("user.home", "~" + FILE_SEPARATOR);
-	private static final String REGEX_FOR_CSV_SPLIT = ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)";
 	
 	private static String inputFileFullPathName;
 	private static String tempFileDirectoryName;
@@ -349,8 +345,8 @@ public class AnalysisDialog extends JDialog {
 			}
 		});
 		inputFileFormatPanel.add(Box.createHorizontalGlue());
-		inputFileFormatPanel.add(labeledCheckBox);
-		inputFileFormatPanel.add(Box.createHorizontalStrut(25));
+		//inputFileFormatPanel.add(labeledCheckBox);
+		//inputFileFormatPanel.add(Box.createHorizontalStrut(25));
 		inputFileFormatPanel.add(inputFileFormatComboBox);
 		inputFileFormatPanel.add(Box.createHorizontalGlue());
 		
@@ -760,10 +756,10 @@ public class AnalysisDialog extends JDialog {
 		internalUsePanel.add(Box.createVerticalStrut(2));
 		internalUsePanel.add(batchWrapperPanel);
 		internalUsePanel.add(Box.createVerticalStrut(2));
-		internalUsePanel.add(compareParametersWrapperPanel);
-		internalUsePanel.add(Box.createVerticalStrut(2));
-		internalUsePanel.add(compareWrapperPanel);
-		internalUsePanel.add(Box.createVerticalStrut(2));
+		//internalUsePanel.add(compareParametersWrapperPanel);
+		//internalUsePanel.add(Box.createVerticalStrut(2));
+		//internalUsePanel.add(compareWrapperPanel);
+		//internalUsePanel.add(Box.createVerticalStrut(2));
 		internalUsePanel.add(hidePanel);
 		internalUsePanel.setVisible(isInternalVersion);
 		
@@ -1119,7 +1115,7 @@ public class AnalysisDialog extends JDialog {
 		    public void done() {
 		        try {
 		        	if (!get()) {
-		        		JOptionPane.showMessageDialog(null, "Error doing file export");
+		        		JOptionPane.showMessageDialog(null, "Error sending input file to server      ");
 		        	}
 		        } catch (InterruptedException ignore) {
 		        } catch (ExecutionException ee) {
@@ -1130,7 +1126,7 @@ public class AnalysisDialog extends JDialog {
 		            } else {
 		                why = ee.getMessage();
 		            }
-		            System.err.println("Error doing file export: " + why);
+		            System.err.println("Error sending input file to server: " + why);
 		        } finally {
 		        	exportInProgress = false;
 		        }
@@ -1166,7 +1162,7 @@ public class AnalysisDialog extends JDialog {
 		    public void done() {
 		        try {
 		        	if (!get()) {
-		        		JOptionPane.showMessageDialog(null, "Error doing data Normalization");
+		        		JOptionPane.showMessageDialog(null, "Error doing data Normalization      ");
 		        	}
 		        } catch (InterruptedException ignore) {
 		        } catch (ExecutionException ee) {
@@ -1230,7 +1226,7 @@ public class AnalysisDialog extends JDialog {
 		    public void done() {
 		        try {
 		        	if (!get()) {
-		        		JOptionPane.showMessageDialog(null, "Error doing Pearson analysis");
+		        		JOptionPane.showMessageDialog(null, "Error doing Pearson analysis      ");
 		        	}
 		        } catch (InterruptedException ignore) {
 		        } catch (ExecutionException ee) {
@@ -1357,7 +1353,7 @@ public class AnalysisDialog extends JDialog {
 		    public void done() {
 		        try {
 		        	if (!get()) {
-		        		JOptionPane.showMessageDialog(null, "Error doing partial correlation analysis");
+		        		JOptionPane.showMessageDialog(null, "Error doing partial correlation analysis      ");
 		        	}
 		        } catch (InterruptedException ignore) {
 		        } catch (ExecutionException ee) {
@@ -1462,7 +1458,7 @@ public class AnalysisDialog extends JDialog {
 		    public void done() {
 		        try {
 		        	if (!get()) {
-		        		JOptionPane.showMessageDialog(null, "Error doing cleanup");
+		        		JOptionPane.showMessageDialog(null, "Error doing cleanup      ");
 		        	}
 		        } catch (InterruptedException ignore) {
 		        } catch (ExecutionException ee) {
@@ -1872,8 +1868,14 @@ public class AnalysisDialog extends JDialog {
 		Response<String> response = null;
 		byte[] buffer = new byte[CorrelationConstants.BUFFER_SIZE];
 		
-		cleanLabelsForAnalysis();
-		
+		inputFileProgressBar.setString("Validating Input File ...");
+		inputFileProgressBar.setStringPainted(true);
+		if (!isValidInputFile()) {
+			inputFileProgressBar.setStringPainted(false);		
+			return response;
+		}
+			
+		inputFileProgressBar.setString("Sending Input File to Server ...");
 		try {
 			inputFile = new File(fileForServerFullPathName);
 			bis = new BufferedInputStream(new FileInputStream(inputFile), CorrelationConstants.BUFFER_SIZE);
@@ -1902,7 +1904,7 @@ public class AnalysisDialog extends JDialog {
 			MetRService service = new MetRService(HttpRequestType.POST, null);
 			response = service.submitMetRRequest(arguments);
 			if (response == null || !response.getResponseStatus().isSuccess()) {
-				return response;
+				break;
 			}
 		}
 		
@@ -1912,87 +1914,53 @@ public class AnalysisDialog extends JDialog {
 			ioe.printStackTrace();
 		}
 		
+		inputFileProgressBar.setStringPainted(false);		
 		return response;
 	}
 	
-	private static void cleanLabelsForAnalysis() {
-    	File sourceFile = new File(inputFileFullPathName);
-    	fileForServerFullPathName = tempFileDirectoryName + File.separatorChar + "fileForServer.tmp";
-    	File destFile = new File(fileForServerFullPathName);
-    	
-    	FileInputStream fis = null;
-    	FileOutputStream fos = null;
+	private static Boolean isValidInputFile() {
+    	TextFile inputFile = null;
 		try {
-			fis = new FileInputStream(sourceFile);
-			fos = new FileOutputStream(destFile);
-		} catch (FileNotFoundException fnfe) {
-			fnfe.printStackTrace();
+			inputFile = new TextFile(new File(inputFileFullPathName));
+		} catch (IOException | NullPointerException e) {
+			JOptionPane.showMessageDialog(null, "File format error: Empty or invalid input file      ");
+    		return false;
 		}
-
-    	BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-    	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
     	
-    	String lineIn = null;
-		try {
-			lineIn = br.readLine();
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
-    	if (lineIn == null) {
-    		return;
+    	Integer k = missingRowLabel(inputFile);
+    	if (k > 0) {
+    		JOptionPane.showMessageDialog(null, "File format error: Missing row label for row " + k + "      ");
+    		return false;
     	}
     	
-    	StringBuilder lineOut = new StringBuilder();
-    	String [] parts = lineIn.split(REGEX_FOR_CSV_SPLIT, -1);
-     	for (String part : parts) {
-    		try {
-    			Double.parseDouble(part);
-    		} catch (NumberFormatException nfe) {
-    			if (!part.isEmpty() && !doubleQuoted(part)) {
-    				part = "\"" + part + "\"";
-    			}
-    		}
-    		lineOut.append(part + ",");
+    	k = missingColumnLabel(inputFile);
+    	if (k > 0) {
+    		JOptionPane.showMessageDialog(null, "File format error: Missing column label for column " + k + "      ");
+    		return false;
     	}
-    	lineOut.deleteCharAt(lineOut.length() - 1);
-    	
-    	try {
-			bw.write(lineOut.toString());
-			bw.newLine();
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
-    	
-    	try {
-			while ((lineIn = br.readLine()) != null) {
-				lineOut = new StringBuilder();
-				parts = lineIn.split(REGEX_FOR_CSV_SPLIT, -1);
-				try {
-	    			Double.parseDouble(parts[0]);
-	    		} catch (NumberFormatException nfe) {
-	    			if (!parts[0].isEmpty() && !doubleQuoted(parts[0])) {
-	    				parts[0] = "\"" + parts[0] + "\"";
-	    			}
-	    		}
-				for (String part : parts) {
-		    		lineOut.append(part + ",");
-		    	}
-		    	lineOut.deleteCharAt(lineOut.length() - 1);
-				bw.write(lineOut.toString());
-				bw.newLine();
-			}
-			bw.close();
-	    	br.close();
-	    	fos.close();
-	    	fis.close();
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		}
-    }
     
-    private static Boolean doubleQuoted(String label) {
-    	return label.length() >= 2 && '"' == label.charAt(0) && '"' == label.charAt(label.length() - 1);
+    	return true;
     }
+	
+	private static Integer missingRowLabel(TextFile file) {
+		for (int i = 1; i <= file.getEndRowIndex(); i++) {
+			if (file.getString(i, 0).isEmpty()) {
+				return i + 1;
+			}
+		}
+		
+		return -1;
+	}
+	
+	private static Integer missingColumnLabel(TextFile file) {
+		for (int i = 1; i <= file.getEndColIndex(0); i++) {
+			if (file.getString(0, i).isEmpty()) {
+				return i + 1;
+			}
+		}
+		
+		return -1;
+	}
 	
 	private static Response<String> getOutputFileFromServer(CorrelationArguments arguments, String result, int offset,
 			String outputFilename, boolean isBinaryFile) {
@@ -2284,7 +2252,8 @@ public class AnalysisDialog extends JDialog {
 			}
 			while ((lineStr = br.readLine()) != null) {
 				if (lineCount > metabCount) {
-					JOptionPane.showMessageDialog(null, "Error: Pearson output file and internal metabolite count do not match.");
+					JOptionPane.showMessageDialog(null, "Error: Pearson output file and internal " +
+							"metabolite count do not match      ");
 					br.close();
 					return;
 				}
@@ -2310,7 +2279,8 @@ public class AnalysisDialog extends JDialog {
 			}
 			br.close();
 			if (!lineCount.equals(metabCount)) {
-				JOptionPane.showMessageDialog(null, "Error: Pearson output file and internal metabolite count do not match.");
+				JOptionPane.showMessageDialog(null, "Error: Pearson output file and internal " +
+						"metabolite count do not match      ");
 				return;
 			}
 		} catch (Throwable t) {
@@ -2532,7 +2502,6 @@ public class AnalysisDialog extends JDialog {
 	}
 	
 	private void enableAnalysisPanel(boolean enable) {
-		analysisPanel.setEnabled(enable);
 		enablePearsonWrapperPanel(enable);
 		enableSliderPanel(currentFileData != null && !"(none)".equals(currentFileData.getName()) && 
 				currentFileData.getDidPearsonCoeff());
