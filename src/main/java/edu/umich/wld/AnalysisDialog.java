@@ -1,5 +1,6 @@
 package edu.umich.wld;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
@@ -41,6 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
@@ -79,7 +81,6 @@ public class AnalysisDialog extends JDialog {
 	
 	private static String inputFileFullPathName;
 	private static String tempFileDirectoryName;
-	private static String fileForServerFullPathName;
 	private static FileData currentFileData = null;
 	private static Integer filteredCount = null;
 	private static Double [] pearsonMaxValues = null;
@@ -94,16 +95,21 @@ public class AnalysisDialog extends JDialog {
 	private static Map<String, String> dataMap = null;
 	private static Map<Integer, List<String>> clusterMap = null;
 	
+	private JPanel outerPanel;
 	private JScrollPane scrollPane;
 	private JPanel innerPanel;
+	private JTabbedPane tabbedPane;
+	
+	private JPanel inputWrapPanel;
+	private JPanel analysisWrapPanel;
 	
 	private static JPanel inputFileFormatPanel;
 	private TitledBorder inputFileFormatBorder;
 	private static JComboBox<String> inputFileFormatComboBox;
 	private static JCheckBox labeledCheckBox;
 
-	private static JPanel inputFileWrapperPanel;
-	private TitledBorder inputFileWrapperBorder;
+	private static JPanel inputFileWrapPanel;
+	private TitledBorder inputFileWrapBorder;
 	private static JPanel inputFilePanel;
 	private static JComboBox<FileData> inputFileComboBox;
 	private static JButton inputFileButton;
@@ -118,8 +124,8 @@ public class AnalysisDialog extends JDialog {
 	private TitledBorder dataOptionsBorder;
 	private static JCheckBox transformCheckBox;
 	private static JCheckBox scaleCheckBox;
-	private JPanel dataActionWrapperPanel;
-	private TitledBorder dataActionWrapperBorder;
+	private JPanel dataActionWrapPanel;
+	private TitledBorder dataActionWrapBorder;
 	private static JPanel dataActionPanel;
 	private static JButton runNormalizedButton;
 	private static JButton viewNormalizedButton;
@@ -130,8 +136,8 @@ public class AnalysisDialog extends JDialog {
 	private static JPanel internalUsePanel;
 	private TitledBorder internalUseBorder;
 	
-	private static JPanel clusterWrapperPanel;
-	private TitledBorder clusterWrapperBorder;
+	private static JPanel clusterWrapPanel;
+	private TitledBorder clusterWrapBorder;
 	private static JPanel clusterPanel;
 	private static JButton runClusterAnalysisButton;
 	private static JButton viewClusterResultsButton;
@@ -139,8 +145,8 @@ public class AnalysisDialog extends JDialog {
 	private static JPanel clusterProgressPanel;
 	private static JProgressBar clusterProgressBar;
 	
-	private static JPanel batchWrapperPanel;
-	private TitledBorder batchWrapperBorder;
+	private static JPanel batchWrapPanel;
+	private TitledBorder batchWrapBorder;
 	private static JPanel batchPanel;
 	private static JButton runBatchAnalysisButton;
 	private static JButton viewBatchNetworkButton;
@@ -149,8 +155,8 @@ public class AnalysisDialog extends JDialog {
 	private static JPanel batchProgressPanel;
 	private static JProgressBar batchProgressBar;
 	
-	private static JPanel compareParametersWrapperPanel;
-	private TitledBorder compareParametersWrapperBorder;
+	private static JPanel compareParametersWrapPanel;
+	private TitledBorder compareParametersWrapBorder;
 	private static JPanel compareParametersPanel;
 	private static JLabel lambdaLabel;
 	private static NumericTextFieldWithListeners<Double> lambdaBox;
@@ -160,8 +166,8 @@ public class AnalysisDialog extends JDialog {
 	private static JPanel compareParametersProgressPanel;
 	private static JProgressBar compareParametersProgressBar;
 	
-	private static JPanel compareWrapperPanel;
-	private TitledBorder compareWrapperBorder;
+	private static JPanel compareWrapPanel;
+	private TitledBorder compareWrapBorder;
 	private static JPanel comparePanel;
 	private static JButton compareButton;
 	private static JButton viewCompareNetworkButton;
@@ -173,8 +179,8 @@ public class AnalysisDialog extends JDialog {
 	private static JPanel hidePanel;
 	private static JButton hideButton;
 	
-	private static JPanel pearsonWrapperPanel;
-	private TitledBorder pearsonWrapperBorder;
+	private static JPanel pearsonWrapPanel;
+	private TitledBorder pearsonWrapBorder;
 	private static JPanel pearsonPanel;
 	private static JButton runPearsonButton;
 	private static JButton createPearsonHeatmapButton;
@@ -201,8 +207,8 @@ public class AnalysisDialog extends JDialog {
 	private static JRadioButton basicButton;
 	private static JRadioButton lassoButton;
 	
-	private JPanel partialWrapperPanel;
-	private TitledBorder partialWrapperBorder;
+	private JPanel partialWrapPanel;
+	private TitledBorder partialWrapBorder;
 	private static JPanel partialPanel;
 	private static JButton runPartialButton;
 	private static JButton viewPartialNetworkButton;
@@ -221,9 +227,9 @@ public class AnalysisDialog extends JDialog {
 		JDialog dialog = new JDialog();
 		dialog.setTitle(title);
 		createControls(dialog);
-		scrollPane = new JScrollPane(innerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
-				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		dialog.add(scrollPane);
+		dialog.add(Box.createHorizontalStrut(8), BorderLayout.WEST);
+		dialog.add(outerPanel, BorderLayout.CENTER);
+		dialog.add(Box.createHorizontalStrut(8), BorderLayout.EAST);
 		setInitialVisibilityStates();
 		setInitialEnabledStates();
 		dialog.addWindowListener(new WindowAdapter() {
@@ -233,16 +239,21 @@ public class AnalysisDialog extends JDialog {
 			}
 		});
 		dialog.setModal(true);
-		dialog.setSize(560, 870);
+		dialog.setSize(600, 550);
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
 	}
 	
 	private void createControls(final JDialog dialog) {
-		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
-		
 		innerPanel = new JPanel();
 		innerPanel.setLayout(new BoxLayout(innerPanel, BoxLayout.Y_AXIS));
+		
+		outerPanel = new JPanel();
+		outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
+				
+		scrollPane = new JScrollPane(innerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		outerPanel.add(scrollPane);
 		
 		inputFilePanel = new JPanel();
 		inputFilePanel.setLayout(new BoxLayout(inputFilePanel, BoxLayout.X_AXIS));
@@ -311,13 +322,13 @@ public class AnalysisDialog extends JDialog {
 		inputFileProgressBar.setIndeterminate(true);
 		inputFileProgressPanel.add(inputFileProgressBar);
 		
-		inputFileWrapperPanel = new JPanel();
-		inputFileWrapperPanel.setLayout(new BoxLayout(inputFileWrapperPanel, BoxLayout.Y_AXIS));
-		inputFileWrapperBorder = BorderFactory.createTitledBorder("Select File (must be .csv)");
-		inputFileWrapperBorder.setTitleFont(boldFontForTitlePanel(inputFileWrapperBorder, false));
-		inputFileWrapperPanel.setBorder(inputFileWrapperBorder);
-		inputFileWrapperPanel.add(inputFilePanel);
-		inputFileWrapperPanel.add(inputFileProgressPanel);
+		inputFileWrapPanel = new JPanel();
+		inputFileWrapPanel.setLayout(new BoxLayout(inputFileWrapPanel, BoxLayout.Y_AXIS));
+		inputFileWrapBorder = BorderFactory.createTitledBorder("Select File (must be .csv)");
+		inputFileWrapBorder.setTitleFont(boldFontForTitlePanel(inputFileWrapBorder, false));
+		inputFileWrapPanel.setBorder(inputFileWrapBorder);
+		inputFileWrapPanel.add(inputFilePanel);
+		inputFileWrapPanel.add(inputFileProgressPanel);
 		
 		inputFileFormatPanel = new JPanel();
 		inputFileFormatBorder = BorderFactory.createTitledBorder("Specify File Format");
@@ -356,7 +367,7 @@ public class AnalysisDialog extends JDialog {
 		inputBorder.setTitleColor(TITLE_COLOR);
 		inputPanel.setBorder(inputBorder);
 		inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
-		inputPanel.add(inputFileWrapperPanel);
+		inputPanel.add(inputFileWrapPanel);
 		inputPanel.add(Box.createVerticalStrut(2));
 		inputPanel.add(inputFileFormatPanel);
 		
@@ -445,13 +456,13 @@ public class AnalysisDialog extends JDialog {
 		dataActionProgressBar.setIndeterminate(true);
 		dataActionProgressPanel.add(dataActionProgressBar);
 		
-		dataActionWrapperPanel = new JPanel();
-		dataActionWrapperBorder = BorderFactory.createTitledBorder("Normalize Data");
-		dataActionWrapperBorder.setTitleFont(boldFontForTitlePanel(dataActionWrapperBorder, false));
-		dataActionWrapperPanel.setBorder(dataActionWrapperBorder);
-		dataActionWrapperPanel.setLayout(new BoxLayout(dataActionWrapperPanel, BoxLayout.Y_AXIS));
-		dataActionWrapperPanel.add(dataActionPanel);
-		dataActionWrapperPanel.add(dataActionProgressPanel);
+		dataActionWrapPanel = new JPanel();
+		dataActionWrapBorder = BorderFactory.createTitledBorder("Normalize Data");
+		dataActionWrapBorder.setTitleFont(boldFontForTitlePanel(dataActionWrapBorder, false));
+		dataActionWrapPanel.setBorder(dataActionWrapBorder);
+		dataActionWrapPanel.setLayout(new BoxLayout(dataActionWrapPanel, BoxLayout.Y_AXIS));
+		dataActionWrapPanel.add(dataActionPanel);
+		dataActionWrapPanel.add(dataActionProgressPanel);
 
 		dataNormalizationPanel = new JPanel();
 		dataNormalizationBorder = BorderFactory.createTitledBorder("Data Normalization");
@@ -461,7 +472,7 @@ public class AnalysisDialog extends JDialog {
 		dataNormalizationPanel.setLayout(new BoxLayout(dataNormalizationPanel, BoxLayout.Y_AXIS));
 		dataNormalizationPanel.add(dataOptionsPanel);
 		dataNormalizationPanel.add(Box.createVerticalStrut(2));
-		dataNormalizationPanel.add(dataActionWrapperPanel);
+		dataNormalizationPanel.add(dataActionWrapPanel);
 		
 		clusterPanel = new JPanel();
 		clusterPanel.setLayout(new BoxLayout(clusterPanel, BoxLayout.X_AXIS));
@@ -528,13 +539,13 @@ public class AnalysisDialog extends JDialog {
 		clusterProgressBar.setIndeterminate(true);
 		clusterProgressPanel.add(clusterProgressBar);
 		
-		clusterWrapperPanel = new JPanel();
-		clusterWrapperBorder = BorderFactory.createTitledBorder("Cluster Analysis");
-		clusterWrapperBorder.setTitleFont(boldFontForTitlePanel(clusterWrapperBorder, false));
-		clusterWrapperPanel.setBorder(clusterWrapperBorder);
-		clusterWrapperPanel.setLayout(new BoxLayout(clusterWrapperPanel, BoxLayout.Y_AXIS));
-		clusterWrapperPanel.add(clusterPanel);
-		clusterWrapperPanel.add(clusterProgressPanel);
+		clusterWrapPanel = new JPanel();
+		clusterWrapBorder = BorderFactory.createTitledBorder("Cluster Analysis");
+		clusterWrapBorder.setTitleFont(boldFontForTitlePanel(clusterWrapBorder, false));
+		clusterWrapPanel.setBorder(clusterWrapBorder);
+		clusterWrapPanel.setLayout(new BoxLayout(clusterWrapPanel, BoxLayout.Y_AXIS));
+		clusterWrapPanel.add(clusterPanel);
+		clusterWrapPanel.add(clusterProgressPanel);
 		
 		batchPanel = new JPanel();
 		batchPanel.setLayout(new BoxLayout(batchPanel, BoxLayout.X_AXIS));
@@ -604,13 +615,13 @@ public class AnalysisDialog extends JDialog {
 		batchProgressBar.setIndeterminate(true);
 		batchProgressPanel.add(batchProgressBar);
 		
-		batchWrapperPanel = new JPanel();
-		batchWrapperBorder = BorderFactory.createTitledBorder("Batch Analysis");
-		batchWrapperBorder.setTitleFont(boldFontForTitlePanel(batchWrapperBorder, false));
-		batchWrapperPanel.setBorder(batchWrapperBorder);
-		batchWrapperPanel.setLayout(new BoxLayout(batchWrapperPanel, BoxLayout.Y_AXIS));
-		batchWrapperPanel.add(batchPanel);
-		batchWrapperPanel.add(batchProgressPanel);
+		batchWrapPanel = new JPanel();
+		batchWrapBorder = BorderFactory.createTitledBorder("Batch Analysis");
+		batchWrapBorder.setTitleFont(boldFontForTitlePanel(batchWrapBorder, false));
+		batchWrapPanel.setBorder(batchWrapBorder);
+		batchWrapPanel.setLayout(new BoxLayout(batchWrapPanel, BoxLayout.Y_AXIS));
+		batchWrapPanel.add(batchPanel);
+		batchWrapPanel.add(batchProgressPanel);
 		
 		compareParametersPanel = new JPanel();
 		compareParametersPanel.setLayout(new BoxLayout(compareParametersPanel, BoxLayout.X_AXIS));
@@ -643,13 +654,13 @@ public class AnalysisDialog extends JDialog {
 		compareParametersProgressBar.setIndeterminate(true);
 		compareParametersProgressPanel.add(compareParametersProgressBar);
 		
-		compareParametersWrapperPanel = new JPanel();
-		compareParametersWrapperBorder = BorderFactory.createTitledBorder("Stability Selection Parameters");
-		compareParametersWrapperBorder.setTitleFont(boldFontForTitlePanel(compareParametersWrapperBorder, false));
-		compareParametersWrapperPanel.setBorder(compareParametersWrapperBorder);
-		compareParametersWrapperPanel.setLayout(new BoxLayout(compareParametersWrapperPanel, BoxLayout.Y_AXIS));
-		compareParametersWrapperPanel.add(compareParametersPanel);
-		compareParametersWrapperPanel.add(compareParametersProgressPanel);
+		compareParametersWrapPanel = new JPanel();
+		compareParametersWrapBorder = BorderFactory.createTitledBorder("Stability Selection Parameters");
+		compareParametersWrapBorder.setTitleFont(boldFontForTitlePanel(compareParametersWrapBorder, false));
+		compareParametersWrapPanel.setBorder(compareParametersWrapBorder);
+		compareParametersWrapPanel.setLayout(new BoxLayout(compareParametersWrapPanel, BoxLayout.Y_AXIS));
+		compareParametersWrapPanel.add(compareParametersPanel);
+		compareParametersWrapPanel.add(compareParametersProgressPanel);
 		
 		comparePanel = new JPanel();
 		comparePanel.setLayout(new BoxLayout(comparePanel, BoxLayout.X_AXIS));
@@ -734,13 +745,13 @@ public class AnalysisDialog extends JDialog {
 		compareProgressBar.setIndeterminate(true);
 		compareProgressPanel.add(compareProgressBar);
 		
-		compareWrapperPanel = new JPanel();
-		compareWrapperBorder = BorderFactory.createTitledBorder("Differential Network Analysis");
-		compareWrapperBorder.setTitleFont(boldFontForTitlePanel(compareWrapperBorder, false));
-		compareWrapperPanel.setBorder(compareWrapperBorder);
-		compareWrapperPanel.setLayout(new BoxLayout(compareWrapperPanel, BoxLayout.Y_AXIS));
-		compareWrapperPanel.add(comparePanel);
-		compareWrapperPanel.add(compareProgressPanel);
+		compareWrapPanel = new JPanel();
+		compareWrapBorder = BorderFactory.createTitledBorder("Differential Network Analysis");
+		compareWrapBorder.setTitleFont(boldFontForTitlePanel(compareWrapBorder, false));
+		compareWrapPanel.setBorder(compareWrapBorder);
+		compareWrapPanel.setLayout(new BoxLayout(compareWrapPanel, BoxLayout.Y_AXIS));
+		compareWrapPanel.add(comparePanel);
+		compareWrapPanel.add(compareProgressPanel);
 		
 		hidePanel = new JPanel();
 		hideButton = new JButton("Hide Internal Use Panel (restart calculator to show again)");
@@ -752,13 +763,13 @@ public class AnalysisDialog extends JDialog {
 		internalUseBorder.setTitleColor(TITLE_COLOR);
 		internalUsePanel.setBorder(internalUseBorder);
 		internalUsePanel.setLayout(new BoxLayout(internalUsePanel, BoxLayout.Y_AXIS));
-		internalUsePanel.add(clusterWrapperPanel);
+		internalUsePanel.add(clusterWrapPanel);
 		internalUsePanel.add(Box.createVerticalStrut(2));
-		internalUsePanel.add(batchWrapperPanel);
+		internalUsePanel.add(batchWrapPanel);
 		internalUsePanel.add(Box.createVerticalStrut(2));
-		//internalUsePanel.add(compareParametersWrapperPanel);
+		//internalUsePanel.add(compareParametersWrapPanel);
 		//internalUsePanel.add(Box.createVerticalStrut(2));
-		//internalUsePanel.add(compareWrapperPanel);
+		//internalUsePanel.add(compareWrapPanel);
 		//internalUsePanel.add(Box.createVerticalStrut(2));
 		internalUsePanel.add(hidePanel);
 		internalUsePanel.setVisible(isInternalVersion);
@@ -898,13 +909,13 @@ public class AnalysisDialog extends JDialog {
 		pearsonProgressBar.setIndeterminate(true);
 		pearsonProgressPanel.add(pearsonProgressBar);
 		
-		pearsonWrapperPanel = new JPanel();
-		pearsonWrapperBorder = BorderFactory.createTitledBorder("Calculate Pearson's Correlations");
-		pearsonWrapperBorder.setTitleFont(boldFontForTitlePanel(pearsonWrapperBorder, false));
-		pearsonWrapperPanel.setBorder(pearsonWrapperBorder);
-		pearsonWrapperPanel.setLayout(new BoxLayout(pearsonWrapperPanel, BoxLayout.Y_AXIS));
-		pearsonWrapperPanel.add(pearsonPanel);
-		pearsonWrapperPanel.add(pearsonProgressPanel);
+		pearsonWrapPanel = new JPanel();
+		pearsonWrapBorder = BorderFactory.createTitledBorder("Calculate Pearson's Correlations");
+		pearsonWrapBorder.setTitleFont(boldFontForTitlePanel(pearsonWrapBorder, false));
+		pearsonWrapPanel.setBorder(pearsonWrapBorder);
+		pearsonWrapPanel.setLayout(new BoxLayout(pearsonWrapPanel, BoxLayout.Y_AXIS));
+		pearsonWrapPanel.add(pearsonPanel);
+		pearsonWrapPanel.add(pearsonProgressPanel);
 		
 		titlePanel = new JPanel();
 		titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.X_AXIS));
@@ -1052,13 +1063,13 @@ public class AnalysisDialog extends JDialog {
 		partialProgressBar.setIndeterminate(true);
 		partialProgressPanel.add(partialProgressBar);
 		
-		partialWrapperPanel = new JPanel();
-		partialWrapperBorder = BorderFactory.createTitledBorder("Calculate Partial Correlations");
-		partialWrapperBorder.setTitleFont(boldFontForTitlePanel(partialWrapperBorder, false));
-		partialWrapperPanel.setBorder(partialWrapperBorder);
-		partialWrapperPanel.setLayout(new BoxLayout(partialWrapperPanel, BoxLayout.Y_AXIS));
-		partialWrapperPanel.add(partialPanel);
-		partialWrapperPanel.add(partialProgressPanel);
+		partialWrapPanel = new JPanel();
+		partialWrapBorder = BorderFactory.createTitledBorder("Calculate Partial Correlations");
+		partialWrapBorder.setTitleFont(boldFontForTitlePanel(partialWrapBorder, false));
+		partialWrapPanel.setBorder(partialWrapBorder);
+		partialWrapPanel.setLayout(new BoxLayout(partialWrapPanel, BoxLayout.Y_AXIS));
+		partialWrapPanel.add(partialPanel);
+		partialWrapPanel.add(partialProgressPanel);
 		
 		analysisPanel = new JPanel();
 		analysisBorder = BorderFactory.createTitledBorder("Data Analysis");
@@ -1066,13 +1077,13 @@ public class AnalysisDialog extends JDialog {
 		analysisBorder.setTitleColor(TITLE_COLOR);
 		analysisPanel.setBorder(analysisBorder);
 		analysisPanel.setLayout(new BoxLayout(analysisPanel, BoxLayout.Y_AXIS));
-		analysisPanel.add(pearsonWrapperPanel);
+		analysisPanel.add(pearsonWrapPanel);
 		analysisPanel.add(Box.createVerticalStrut(2));
 		analysisPanel.add(sliderPanel);
 		analysisPanel.add(Box.createVerticalStrut(2));
 		analysisPanel.add(methodPanel);
 		analysisPanel.add(Box.createVerticalStrut(2));
-		analysisPanel.add(partialWrapperPanel);
+		analysisPanel.add(partialWrapPanel);
 		
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -1089,17 +1100,26 @@ public class AnalysisDialog extends JDialog {
 		buttonPanel.add(closeButton);
 		buttonPanel.add(Box.createHorizontalGlue());
 		
+		inputWrapPanel = new JPanel();
+		inputWrapPanel.setLayout(new BoxLayout(inputWrapPanel, BoxLayout.Y_AXIS));
+		inputWrapPanel.add(inputPanel);
+		LayoutUtils.addBlankLines(inputWrapPanel, 10);
+		
+		analysisWrapPanel = new JPanel();
+		analysisWrapPanel.setLayout(new BoxLayout(analysisWrapPanel, BoxLayout.Y_AXIS));
+		analysisWrapPanel.add(analysisPanel);
+		
+		tabbedPane = new JTabbedPane();
+		tabbedPane.addTab("Input  ", null, inputWrapPanel, "Select Input Files and Configuration   ");
+		tabbedPane.addTab("Data Analysis  ", null, analysisWrapPanel, "Choose Settings and Run Analysis  ");
+		
 		innerPanel.add(Box.createVerticalStrut(5));
-		innerPanel.add(inputPanel);
+		innerPanel.add(tabbedPane);
 		innerPanel.add(Box.createVerticalStrut(5));
-		innerPanel.add(dataNormalizationPanel);
-		innerPanel.add(Box.createVerticalStrut(5));
-		innerPanel.add(internalUsePanel);
-		innerPanel.add(Box.createVerticalStrut(5));
-		innerPanel.add(analysisPanel);
-		innerPanel.add(Box.createVerticalStrut(5));
-		innerPanel.add(buttonPanel);
-		innerPanel.add(Box.createVerticalStrut(5));
+		
+		outerPanel.add(Box.createVerticalStrut(5));
+		outerPanel.add(buttonPanel);
+		outerPanel.add(Box.createVerticalStrut(5));
 	}
 	
 	private void doFileExportInWorkerThread() {
@@ -1107,7 +1127,7 @@ public class AnalysisDialog extends JDialog {
 		    @Override
 		    public Boolean doInBackground() {
 		    	inputFileProgressPanel.setVisible(true);
-				inputFilePanel.setVisible(false);
+				inputPanel.setVisible(false);
 		    	return doFileExport();
 		    }
 
@@ -1130,7 +1150,7 @@ public class AnalysisDialog extends JDialog {
 		        } finally {
 		        	exportInProgress = false;
 		        }
-		        inputFilePanel.setVisible(true);
+		        inputPanel.setVisible(true);
 				inputFileProgressPanel.setVisible(false);
 				countSamplesAndMetabolites();
 		        enableInputPanel(true);
@@ -1152,7 +1172,7 @@ public class AnalysisDialog extends JDialog {
 		    @Override
 		    public Boolean doInBackground() {
 		    	disableAllActionControls();
-				enableDataActionWrapperPanel(true);
+				enableDataActionWrapPanel(true);
 				dataActionProgressPanel.setVisible(true);
 				dataActionPanel.setVisible(false);
 		    	return doNormalization();
@@ -1196,11 +1216,11 @@ public class AnalysisDialog extends JDialog {
 		    public Boolean doInBackground() {
 		    	disableAllActionControls();
 		    	if (CorrelationConstants.PEARSON_TREECUT.equals(analysis)) {
-		    		enableClusterWrapperPanel(true);
+		    		enableClusterWrapPanel(true);
 					clusterProgressPanel.setVisible(true);
 					clusterPanel.setVisible(false);
 		    	} else {
-					enablePearsonWrapperPanel(true);
+					enablePearsonWrapPanel(true);
 					pearsonProgressPanel.setVisible(true);
 					pearsonPanel.setVisible(false);
 		    	}
@@ -1329,20 +1349,20 @@ public class AnalysisDialog extends JDialog {
 		    public Boolean doInBackground() {
 		    	disableAllActionControls();
 		    	if (CorrelationConstants.PARTIAL_BATCH.equals(analysis)) {
-		    		enableBatchWrapperPanel(true);
+		    		enableBatchWrapPanel(true);
 					batchProgressPanel.setVisible(true);
 					batchPanel.setVisible(false);
 		    	} else if (CorrelationConstants.PARTIAL_BASIC.equals(analysis) ||
 		    			CorrelationConstants.PARTIAL_LASSO.equals(analysis)) {
-					enablePartialWrapperPanel(true);
+					enablePartialWrapPanel(true);
 					partialProgressPanel.setVisible(true);
 					partialPanel.setVisible(false);
 		    	} else if (CorrelationConstants.PARTIAL_COMPARE.equals(analysis)) {
-		    		enableCompareWrapperPanel(true);
+		    		enableCompareWrapPanel(true);
 		    		compareProgressPanel.setVisible(true);
 		    		comparePanel.setVisible(false);
 		    	} else if (CorrelationConstants.PARTIAL_BIC_TUNE.equals(analysis)) {
-		    		enableCompareParametersWrapperPanel(true);
+		    		enableCompareParametersWrapPanel(true);
 		    		compareParametersProgressPanel.setVisible(true);
 		    		compareParametersPanel.setVisible(false);
 		    	}
@@ -1412,7 +1432,7 @@ public class AnalysisDialog extends JDialog {
 		    @Override
 		    public Void doInBackground() {
 		    	disableAllActionControls();
-				enablePartialWrapperPanel(true);
+				enablePartialWrapPanel(true);
 				partialProgressPanel.setVisible(true);
 				partialPanel.setVisible(false);
 				String[] arguments = new String[2];
@@ -1877,7 +1897,7 @@ public class AnalysisDialog extends JDialog {
 			
 		inputFileProgressBar.setString("Sending Input File to Server ...");
 		try {
-			inputFile = new File(fileForServerFullPathName);
+			inputFile = new File(inputFileFullPathName);
 			bis = new BufferedInputStream(new FileInputStream(inputFile), CorrelationConstants.BUFFER_SIZE);
 		} catch (FileNotFoundException fnfe) {
 			fnfe.printStackTrace();
@@ -1926,6 +1946,11 @@ public class AnalysisDialog extends JDialog {
 			JOptionPane.showMessageDialog(null, "File format error: Empty or invalid input file      ");
     		return false;
 		}
+		
+		if (!enoughEntries(inputFile)) {
+			JOptionPane.showMessageDialog(null, "File format error: Must have at least 2 rows and 2 columns     ");
+    		return false;
+		}
     	
     	Integer k = missingRowLabel(inputFile);
     	if (k > 0) {
@@ -1938,9 +1963,27 @@ public class AnalysisDialog extends JDialog {
     		JOptionPane.showMessageDialog(null, "File format error: Missing column label for column " + k + "      ");
     		return false;
     	}
+    	
+    	k = nonMatchingRows(inputFile);
+    	if (k > 0) {
+    		JOptionPane.showMessageDialog(null, "File format error: Wrong number of entries in row " + k + "      ");
+    		return false;
+    	}
     
     	return true;
     }
+	
+	private static Boolean enoughEntries(TextFile file) {
+		if (file.getEndRowIndex() < 2) {
+			return false;
+		}
+		
+		if (file.getEndColIndex(0) < 2) {
+			return false;
+		}
+		
+		return true;
+	}
 	
 	private static Integer missingRowLabel(TextFile file) {
 		for (int i = 1; i <= file.getEndRowIndex(); i++) {
@@ -1955,6 +1998,17 @@ public class AnalysisDialog extends JDialog {
 	private static Integer missingColumnLabel(TextFile file) {
 		for (int i = 1; i <= file.getEndColIndex(0); i++) {
 			if (file.getString(0, i).isEmpty()) {
+				return i + 1;
+			}
+		}
+		
+		return -1;
+	}
+	
+	private static Integer nonMatchingRows(TextFile file) {
+		int width = file.getEndColIndex(0);
+		for (int i = 1; i <= file.getEndRowIndex(); i++) {
+			if (file.getEndColIndex(i) != width) {
 				return i + 1;
 			}
 		}
@@ -2352,18 +2406,18 @@ public class AnalysisDialog extends JDialog {
 	
 	private static void enableInputPanel(boolean enable) {
 		inputPanel.setEnabled(enable);
-		enableInputFileWrapperPanel(enable);
+		enableInputFileWrapPanel(enable);
 		enableInputFileFormatPanel(enable);
 	}
 	
-	private static void enableInputFileWrapperPanel(boolean enable) {
-		inputFileWrapperPanel.setEnabled(enable);
+	private static void enableInputFileWrapPanel(boolean enable) {
+		inputFileWrapPanel.setEnabled(enable);
 		enableInputFilePanel(enable);
 		enableInputFileProgressPanel(enable);
 	}
 	
 	private static void enableInputFilePanel(boolean enable) {
-		inputFilePanel.setEnabled(enable);
+		inputPanel.setEnabled(enable);
 		inputFileComboBox.setEnabled(enable);
 		inputFileButton.setEnabled(enable);
 	}
@@ -2382,7 +2436,7 @@ public class AnalysisDialog extends JDialog {
 	private void enableDataNormalizationPanel(boolean enable) {
 		dataNormalizationPanel.setEnabled(enable);
 		enableDataOptionsPanel(enable);
-		enableDataActionWrapperPanel(enable);
+		enableDataActionWrapPanel(enable);
 	}
 	
 	private void enableDataOptionsPanel(boolean enable) {
@@ -2391,8 +2445,8 @@ public class AnalysisDialog extends JDialog {
 		scaleCheckBox.setEnabled(enable);
 	}
 	
-	private void enableDataActionWrapperPanel(boolean enable) {
-		dataActionWrapperPanel.setEnabled(enable);
+	private void enableDataActionWrapPanel(boolean enable) {
+		dataActionWrapPanel.setEnabled(enable);
 		enableDataActionPanel(enable);
 		enableDataActionProgressPanel(enable);
 	}
@@ -2413,16 +2467,16 @@ public class AnalysisDialog extends JDialog {
 	
 	private static void enableInternalUsePanel(boolean enable) {
 		internalUsePanel.setEnabled(enable);
-		enableClusterWrapperPanel(currentFileData != null && !"(none)".equals(currentFileData.getName()) && 
+		enableClusterWrapPanel(currentFileData != null && !"(none)".equals(currentFileData.getName()) && 
 				currentFileData.getDidPearsonCoeff());
-		enableBatchWrapperPanel(currentFileData != null && !"(none)".equals(currentFileData.getName()) && 
+		enableBatchWrapPanel(currentFileData != null && !"(none)".equals(currentFileData.getName()) && 
 				currentFileData.getDidPearsonTreecut());
-		enableCompareParametersWrapperPanel(currentFileData != null && !"(none)".equals(currentFileData.getName()));
-		enableCompareWrapperPanel(currentFileData != null && !"(none)".equals(currentFileData.getName()));
+		enableCompareParametersWrapPanel(currentFileData != null && !"(none)".equals(currentFileData.getName()));
+		enableCompareWrapPanel(currentFileData != null && !"(none)".equals(currentFileData.getName()));
 	}
 	
-	private static void enableClusterWrapperPanel(boolean enable) {
-		clusterWrapperPanel.setEnabled(enable);
+	private static void enableClusterWrapPanel(boolean enable) {
+		clusterWrapPanel.setEnabled(enable);
 		enableClusterPanel(enable);
 		enableClusterProgressPanel(enable);
 	}
@@ -2440,8 +2494,8 @@ public class AnalysisDialog extends JDialog {
 		clusterProgressBar.setEnabled(enable);
 	}
 	
-	private static void enableBatchWrapperPanel(boolean enable) {
-		batchWrapperPanel.setEnabled(enable);
+	private static void enableBatchWrapPanel(boolean enable) {
+		batchWrapPanel.setEnabled(enable);
 		enableBatchPanel(enable);
 		enableBatchProgressPanel(enable);
 	}
@@ -2460,8 +2514,8 @@ public class AnalysisDialog extends JDialog {
 		batchProgressBar.setEnabled(enable);
 	}
 	
-	private static void enableCompareParametersWrapperPanel(boolean enable) {
-		compareParametersWrapperPanel.setEnabled(enable);
+	private static void enableCompareParametersWrapPanel(boolean enable) {
+		compareParametersWrapPanel.setEnabled(enable);
 		enableCompareParametersPanel(enable);
 		enableCompareParametersProgressPanel(enable);
 	}
@@ -2481,8 +2535,8 @@ public class AnalysisDialog extends JDialog {
 		compareParametersProgressBar.setEnabled(enable);
 	}
 	
-	private static void enableCompareWrapperPanel(boolean enable) {
-		compareWrapperPanel.setEnabled(enable);
+	private static void enableCompareWrapPanel(boolean enable) {
+		compareWrapPanel.setEnabled(enable);
 		enableComparePanel(enable);
 		enableCompareProgressPanel(enable);
 	}
@@ -2502,15 +2556,15 @@ public class AnalysisDialog extends JDialog {
 	}
 	
 	private void enableAnalysisPanel(boolean enable) {
-		enablePearsonWrapperPanel(enable);
+		enablePearsonWrapPanel(enable);
 		enableSliderPanel(currentFileData != null && !"(none)".equals(currentFileData.getName()) && 
 				currentFileData.getDidPearsonCoeff());
 		enableMethodPanel(enable);
-		enablePartialWrapperPanel(enable);
+		enablePartialWrapPanel(enable);
 	}
 	
-	private static void enablePearsonWrapperPanel(boolean enable) {
-		pearsonWrapperPanel.setEnabled(enable);
+	private static void enablePearsonWrapPanel(boolean enable) {
+		pearsonWrapPanel.setEnabled(enable);
 		enablePearsonPanel(enable);
 		enablePearsonProgressPanel(enable);
 	}
@@ -2567,8 +2621,8 @@ public class AnalysisDialog extends JDialog {
 		lassoButton.setEnabled(enable);
 	}
 	
-	private void enablePartialWrapperPanel(boolean enable) {
-		partialWrapperPanel.setEnabled(enable);
+	private void enablePartialWrapPanel(boolean enable) {
+		partialWrapPanel.setEnabled(enable);
 		enablePartialPanel(enable);
 		enablePartialProgressPanel(enable);
 	}

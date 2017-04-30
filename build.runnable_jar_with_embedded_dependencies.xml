@@ -6,7 +6,7 @@
                 <attribute name="Main-Class" value="edu.umich.wld.CorrelationCalculator"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
-        	<zipfileset excludes="META-INF/*.SF" src="/Users/wld/.m2/repository/edu/umich/wld/correlation-calculator/1.0.0/correlation-calculator-1.0.0.jar"/>
+        	<zipfileset excludes="META-INF/*.SF" src="/Users/wld/.m2/repository/edu/umich/wld/correlation-calculator/1.0.1/correlation-calculator-1.0.1.jar"/>
         	<zipfileset excludes="META-INF/*.SF" src="/Users/wld/.m2/repository/org/ncibi/ws/ws-client/1.0/ws-client-1.0.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="/Users/wld/.m2/repository/org/ncibi/ws/ws-common/1.0/ws-common-1.0.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="/Users/wld/.m2/repository/cytoscape/cytoscape-weblaunch/1.0.0/cytoscape-weblaunch-1.0.0.jar"/>

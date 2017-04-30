@@ -25,7 +25,7 @@ public class CorrelationCalculator {
 		
 		logger.info("Starting Correlation Calculator");
 		
-		new AnalysisDialog("Correlation Calculator");
+		new AnalysisDialog("Correlation Calculator v1.0.1");
 		
 		System.exit(0);
 	}

@@ -4,7 +4,7 @@
 	<groupId>edu.umich.wld</groupId>
 	<artifactId>correlation-calculator</artifactId>
 	<name>Correlation Calculator</name>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	
 	<dependencies>
 		<dependency>
