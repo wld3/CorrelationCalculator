@@ -31,8 +31,8 @@ public class SaveDialog extends JDialog {
 	private static JButton generateCoeffButton;
 	private static JCheckBox saveCoeffCheckBox;
 	
-	private static JPanel coeffProgressPanel;
-	private JProgressBar coeffProgressBar;
+	private static JPanel coeffProgPanel;
+	private JProgressBar coeffProgBar;
 	
 	private JPanel coeffWrapperPanel;
 	private TitledBorder coeffWrapperBorder;
@@ -41,8 +41,8 @@ public class SaveDialog extends JDialog {
 	private static JButton generateStaticHeatmapButton;
 	private static JCheckBox saveStaticHeatmapCheckBox;
 	
-	private static JPanel staticHeatmapProgressPanel;
-	private JProgressBar staticHeatmapProgressBar;
+	private static JPanel staticHeatmapProgPanel;
+	private JProgressBar staticHeatmapProgBar;
 	
 	private JPanel staticHeatmapWrapperPanel;
 	private TitledBorder staticHeatmapWrapperBorder;
@@ -51,8 +51,8 @@ public class SaveDialog extends JDialog {
 	private static JButton generateHistogramButton;
 	private static JCheckBox saveHistogramCheckBox;
 	
-	private static JPanel histogramProgressPanel;
-	private JProgressBar histogramProgressBar;
+	private static JPanel histogramProgPanel;
+	private JProgressBar histogramProgBar;
 	
 	private JPanel histogramWrapperPanel;
 	private TitledBorder histogramWrapperBorder;
@@ -62,8 +62,8 @@ public class SaveDialog extends JDialog {
 	private static JCheckBox saveInteractiveHeatmapCheckBox;
 	private static JButton interactiveHeatmapInfoButton;
 	
-	private static JPanel interactiveHeatmapProgressPanel;
-	private JProgressBar interactiveHeatmapProgressBar;
+	private static JPanel interactiveHeatmapProgPanel;
+	private JProgressBar interactiveHeatmapProgBar;
 	
 	private JPanel interactiveHeatmapWrapperPanel;
 	private TitledBorder interactiveHeatmapWrapperBorder;
@@ -120,12 +120,12 @@ public class SaveDialog extends JDialog {
 		coeffPanel.add(generateCoeffButton);
 		coeffPanel.add(Box.createHorizontalGlue());
 		
-		coeffProgressPanel = new JPanel();
-		coeffProgressPanel.setLayout(new BoxLayout(coeffProgressPanel, BoxLayout.X_AXIS));
-		coeffProgressPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
-		coeffProgressBar = new JProgressBar(0, 500);
-		coeffProgressBar.setIndeterminate(true);
-		coeffProgressPanel.add(coeffProgressBar);
+		coeffProgPanel = new JPanel();
+		coeffProgPanel.setLayout(new BoxLayout(coeffProgPanel, BoxLayout.X_AXIS));
+		coeffProgPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+		coeffProgBar = new JProgressBar(0, 500);
+		coeffProgBar.setIndeterminate(true);
+		coeffProgPanel.add(coeffProgBar);
 		
 		coeffWrapperPanel = new JPanel();
 		coeffWrapperPanel.setLayout(new BoxLayout(coeffWrapperPanel, BoxLayout.Y_AXIS));
@@ -133,7 +133,7 @@ public class SaveDialog extends JDialog {
 		coeffWrapperBorder.setTitleFont(boldFontForTitlePanel(coeffWrapperBorder, false));
 		coeffWrapperPanel.setBorder(coeffWrapperBorder);
 		coeffWrapperPanel.add(coeffPanel);
-		coeffWrapperPanel.add(coeffProgressPanel);
+		coeffWrapperPanel.add(coeffProgPanel);
 		
 		histogramPanel = new JPanel();
 		histogramPanel.setLayout(new BoxLayout(histogramPanel, BoxLayout.X_AXIS));
@@ -155,12 +155,12 @@ public class SaveDialog extends JDialog {
 		histogramPanel.add(generateHistogramButton);
 		histogramPanel.add(Box.createHorizontalGlue());
 		
-		histogramProgressPanel = new JPanel();
-		histogramProgressPanel.setLayout(new BoxLayout(histogramProgressPanel, BoxLayout.X_AXIS));
-		histogramProgressPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
-		histogramProgressBar = new JProgressBar(0, 500);
-		histogramProgressBar.setIndeterminate(true);
-		histogramProgressPanel.add(histogramProgressBar);
+		histogramProgPanel = new JPanel();
+		histogramProgPanel.setLayout(new BoxLayout(histogramProgPanel, BoxLayout.X_AXIS));
+		histogramProgPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+		histogramProgBar = new JProgressBar(0, 500);
+		histogramProgBar.setIndeterminate(true);
+		histogramProgPanel.add(histogramProgBar);
 		
 		histogramWrapperPanel = new JPanel();
 		histogramWrapperPanel.setLayout(new BoxLayout(histogramWrapperPanel, BoxLayout.Y_AXIS));
@@ -168,7 +168,7 @@ public class SaveDialog extends JDialog {
 		histogramWrapperBorder.setTitleFont(boldFontForTitlePanel(histogramWrapperBorder, false));
 		histogramWrapperPanel.setBorder(histogramWrapperBorder);
 		histogramWrapperPanel.add(histogramPanel);
-		histogramWrapperPanel.add(histogramProgressPanel);
+		histogramWrapperPanel.add(histogramProgPanel);
 		
 		staticHeatmapPanel = new JPanel();
 		staticHeatmapPanel.setLayout(new BoxLayout(staticHeatmapPanel, BoxLayout.X_AXIS));
@@ -190,12 +190,12 @@ public class SaveDialog extends JDialog {
 		staticHeatmapPanel.add(generateStaticHeatmapButton);
 		staticHeatmapPanel.add(Box.createHorizontalGlue());
 		
-		staticHeatmapProgressPanel = new JPanel();
-		staticHeatmapProgressPanel.setLayout(new BoxLayout(staticHeatmapProgressPanel, BoxLayout.X_AXIS));
-		staticHeatmapProgressPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
-		staticHeatmapProgressBar = new JProgressBar(0, 500);
-		staticHeatmapProgressBar.setIndeterminate(true);
-		staticHeatmapProgressPanel.add(staticHeatmapProgressBar);
+		staticHeatmapProgPanel = new JPanel();
+		staticHeatmapProgPanel.setLayout(new BoxLayout(staticHeatmapProgPanel, BoxLayout.X_AXIS));
+		staticHeatmapProgPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+		staticHeatmapProgBar = new JProgressBar(0, 500);
+		staticHeatmapProgBar.setIndeterminate(true);
+		staticHeatmapProgPanel.add(staticHeatmapProgBar);
 		
 		staticHeatmapWrapperPanel = new JPanel();
 		staticHeatmapWrapperPanel.setLayout(new BoxLayout(staticHeatmapWrapperPanel, BoxLayout.Y_AXIS));
@@ -203,7 +203,7 @@ public class SaveDialog extends JDialog {
 		staticHeatmapWrapperBorder.setTitleFont(boldFontForTitlePanel(staticHeatmapWrapperBorder, false));
 		staticHeatmapWrapperPanel.setBorder(staticHeatmapWrapperBorder);
 		staticHeatmapWrapperPanel.add(staticHeatmapPanel);
-		staticHeatmapWrapperPanel.add(staticHeatmapProgressPanel);
+		staticHeatmapWrapperPanel.add(staticHeatmapProgPanel);
 		
 		interactiveHeatmapPanel = new JPanel();
 		interactiveHeatmapPanel.setLayout(new BoxLayout(interactiveHeatmapPanel, BoxLayout.X_AXIS));
@@ -237,12 +237,12 @@ public class SaveDialog extends JDialog {
 		interactiveHeatmapPanel.add(interactiveHeatmapInfoButton);
 		interactiveHeatmapPanel.add(Box.createHorizontalGlue());
 		
-		interactiveHeatmapProgressPanel = new JPanel();
-		interactiveHeatmapProgressPanel.setLayout(new BoxLayout(interactiveHeatmapProgressPanel, BoxLayout.X_AXIS));
-		interactiveHeatmapProgressPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
-		interactiveHeatmapProgressBar = new JProgressBar(0, 500);
-		interactiveHeatmapProgressBar.setIndeterminate(true);
-		interactiveHeatmapProgressPanel.add(interactiveHeatmapProgressBar);
+		interactiveHeatmapProgPanel = new JPanel();
+		interactiveHeatmapProgPanel.setLayout(new BoxLayout(interactiveHeatmapProgPanel, BoxLayout.X_AXIS));
+		interactiveHeatmapProgPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+		interactiveHeatmapProgBar = new JProgressBar(0, 500);
+		interactiveHeatmapProgBar.setIndeterminate(true);
+		interactiveHeatmapProgPanel.add(interactiveHeatmapProgBar);
 		
 		interactiveHeatmapWrapperPanel = new JPanel();
 		interactiveHeatmapWrapperPanel.setLayout(new BoxLayout(interactiveHeatmapWrapperPanel, BoxLayout.Y_AXIS));
@@ -250,7 +250,7 @@ public class SaveDialog extends JDialog {
 		interactiveHeatmapWrapperBorder.setTitleFont(boldFontForTitlePanel(interactiveHeatmapWrapperBorder, false));
 		interactiveHeatmapWrapperPanel.setBorder(interactiveHeatmapWrapperBorder);
 		interactiveHeatmapWrapperPanel.add(interactiveHeatmapPanel);
-		interactiveHeatmapWrapperPanel.add(interactiveHeatmapProgressPanel);
+		interactiveHeatmapWrapperPanel.add(interactiveHeatmapProgPanel);
 		
 		buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -313,10 +313,10 @@ public class SaveDialog extends JDialog {
 	}
 	
 	private void setInitialStates() {
-		coeffProgressPanel.setVisible(false);
-		staticHeatmapProgressPanel.setVisible(false);
-		histogramProgressPanel.setVisible(false);
-		interactiveHeatmapProgressPanel.setVisible(false);
+		coeffProgPanel.setVisible(false);
+		staticHeatmapProgPanel.setVisible(false);
+		histogramProgPanel.setVisible(false);
+		interactiveHeatmapProgPanel.setVisible(false);
 		
 		File coeffFile = new File(outputFileFirstPiece + CorrelationConstants.PEARSON_COEFF + outputFileSecondPiece + ".csv");
 		boolean haveCoeffFile = coeffFile.exists();
@@ -351,32 +351,32 @@ public class SaveDialog extends JDialog {
 		return coeffPanel;
 	}
 	
-	public static JPanel getCoeffProgressPanel() {
-		return coeffProgressPanel;
+	public static JPanel getCoeffProgPanel() {
+		return coeffProgPanel;
 	}
 	
 	public static JPanel getHistogramPanel() {
 		return histogramPanel;
 	}
 	
-	public static JPanel getHistogramProgressPanel() {
-		return histogramProgressPanel;
+	public static JPanel getHistogramProgPanel() {
+		return histogramProgPanel;
 	}
 	
 	public static JPanel getStaticHeatmapPanel() {
 		return staticHeatmapPanel;
 	}
 	
-	public static JPanel getStaticHeatmapProgressPanel() {
-		return staticHeatmapProgressPanel;
+	public static JPanel getStaticHeatmapProgPanel() {
+		return staticHeatmapProgPanel;
 	}
 	
 	public static JPanel getInteractiveHeatmapPanel() {
 		return interactiveHeatmapPanel;
 	}
 	
-	public static JPanel getInteractiveHeatmapProgressPanel() {
-		return interactiveHeatmapProgressPanel;
+	public static JPanel getInteractiveHeatmapProgPanel() {
+		return interactiveHeatmapProgPanel;
 	}
 	
 	public static JCheckBox getSaveCoeffCheckBox() {
