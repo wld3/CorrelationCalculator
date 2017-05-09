@@ -1092,7 +1092,7 @@ public class AnalysisDialog extends JDialog {
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 		buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		
-		prevButton = new JButton("<< Previous");
+		prevButton = new JButton("<<  Previous");
 		prevButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() - 1);
@@ -1106,7 +1106,7 @@ public class AnalysisDialog extends JDialog {
 			}
 		});
 		
-		nextButton = new JButton("Next >>");
+		nextButton = new JButton("Next  >>");
 		nextButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				tabbedPane.setSelectedIndex(tabbedPane.getSelectedIndex() + 1);
@@ -1116,8 +1116,8 @@ public class AnalysisDialog extends JDialog {
 		buttonPanel.add(Box.createHorizontalGlue());
 		buttonPanel.add(prevButton);
 		buttonPanel.add(Box.createHorizontalGlue());
-		buttonPanel.add(closeButton);
-		buttonPanel.add(Box.createHorizontalGlue());
+		//buttonPanel.add(closeButton);
+		//buttonPanel.add(Box.createHorizontalGlue());
 		buttonPanel.add(nextButton);
 		buttonPanel.add(Box.createHorizontalGlue());
 		
